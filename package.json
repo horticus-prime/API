@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/michaelchapman-401-advanced-javascript/water-sensor#readme",
   "dependencies": {
+    "eslint": "^6.0.0",
     "express": "^4.17.1"
   }
 }
