@@ -1,4 +1,5 @@
-# Soil-sensor
+# API Server
+
 DevStation, Apprenti, CodeFellows 401 midterm project by 
 
 ## Group Members of Horticus-Prime
