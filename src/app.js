@@ -52,9 +52,9 @@ function getMoisture(request,response,next) {
 
 // Constructor 
 function MoistureData(data) {
-  this.id = data.id;
-  this.int = data.int;
-  this.message = data.message;
+  this.user_id = data.user_id;
+  this.timestamp = data.timestamp;
+  this.moistureNumber = data.moistureNumber;
 }
 
 
