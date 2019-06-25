@@ -1,33 +1,81 @@
 'use strict';
 
 const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
 const io = require('socket.io-client');
+
+// Esoteric Resources
+const errorHandler = require( './middleware/error.js');
+const notFound = require( './middleware/404.js' );
+
+// Models
+const Moisture = require('./models/moisture.js');
+const moisture = new Moisture();
 
 const socket = io.connect('http://localhost:3005');
 
 const app = express();
 
+app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
 
-let moistureSensor = (message) => {
-  console.log('Hello World from TCP');
-  console.log('Message: ', message);
-  // Save to DB
+// Routes
+app.get('/moisture', getAllMoisture);
+app.get('/moisture/:id', getMoisture);
+
+// Catchalls
+app.use(notFound);
+app.use(errorHandler);
+
+// Route handlers
+function getAllMoisture(request,response,next) {
+  // expects an array of object to be returned from the model
+  moisture.get()
+    .then( result => {
+      socket.emit('req-data', result);
+      response.status(200).json(result);
+    })
+    .catch( next );
+}
+
+function getMoisture(request,response,next) {
+  // expects an array with the one matching record from the model
+  moisture.get(request.params.id)
+    .then( result => {
+      socket.emit('req-data', result);
+      response.status(200).json(result[0]); 
+    })
+    .catch( next );
+}
+
+// Constructor 
+function MoistureData(data) {
+  this.user_id = data.user_id;
+  this.timestamp = data.timestamp;
+  this.moistureNumber = data.moistureNumber;
+}
+
+
+let moistureSensor = data => {
+  if (data) {
+    let constructedData = new MoistureData(data);
+
+    moisture.post(constructedData)
+      .then(response => {
+        // emit save
+        socket.emit('save-status', response);
+      })
+      .catch(error => {
+        // emit error
+        socket.emit('save-status', error);
+      });
+  } else if (error) {
+    // emit error
+    socket.emit('save-status', error);
+  }
 };
-
-app.get('/data', (req, res) => {
-  let payload = 'Hello World from client';
-  socket.emit('req-data', payload);
-  res.status(200).send(payload);
-});
-
-app.get('*', (req, res) => {
-  res.status(404).send('404 not found');
-});
-
-app.use((err, req, res) => {
-  res.status(500).send('Server error!');
-});
 
 socket.on('moisture-sensor', moistureSensor);
 
