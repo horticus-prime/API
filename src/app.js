@@ -1,9 +1,9 @@
 'use strict';
 
 const express = require('express');
-const io = require('socket.io-client');
 const cors = require('cors');
 const morgan = require('morgan');
+const io = require('socket.io-client');
 
 // Esoteric Resources
 const errorHandler = require( './middleware/error.js');
@@ -21,25 +21,36 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
-let moistureSensor = (message) => {
-  console.log('Hello World from TCP');
-  console.log('Message: ', message);
-  // Save to DB
+// Catchalls
+app.use(notFound);
+app.use(errorHandler);
+
+// Constructor 
+function MoistureData(data) {
+  this.id = data.id;
+  this.int = data.int;
+  this.message = data.message;
+}
+
+
+let moistureSensor = data => {
+  if (data) {
+    let constructedData = new MoistureData(data);
+
+    moisture.post(constructedData)
+      .then(response => {
+        // emit save
+        socket.emit('save-status', response);
+      })
+      .catch(error => {
+        // emit error
+        socket.emit('save-status', error);
+      });
+  } else if (error) {
+    // emit error
+    socket.emit('save-status', error);
+  }
 };
-
-app.get('/data', (req, res) => {
-  let payload = 'Hello World from client';
-  socket.emit('req-data', payload);
-  res.status(200).send(payload);
-});
-
-app.get('*', (req, res) => {
-  res.status(404).send('404 not found');
-});
-
-app.use((err, req, res) => {
-  res.status(500).send('Server error!');
-});
 
 socket.on('moisture-sensor', moistureSensor);
 
