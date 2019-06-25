@@ -10,7 +10,7 @@ const errorHandler = require( './middleware/error.js');
 const notFound = require( './middleware/404.js' );
 
 // Models
-const Moisture = require('./models/moisture.js');
+const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
 
 const socket = io.connect('http://localhost:3005');
@@ -24,10 +24,18 @@ app.use(express.json());
 // Routes
 app.get('/moisture', getAllMoisture);
 app.get('/moisture/:id', getMoisture);
+app.post('/moisture', postData);
 
 // Catchalls
 app.use(notFound);
 app.use(errorHandler);
+
+// Constructor 
+function MoistureData(data) {
+  this.moistureCategory = data.moistureCategory;
+  this.timestamp = data.timestamp;
+  this.moistureNumber = data.moistureNumber;
+}
 
 // Route handlers
 function getAllMoisture(request,response,next) {
@@ -50,13 +58,18 @@ function getMoisture(request,response,next) {
     .catch( next );
 }
 
-// Constructor 
-function MoistureData(data) {
-  this.user_id = data.user_id;
-  this.timestamp = data.timestamp;
-  this.moistureNumber = data.moistureNumber;
-}
+function postData(req, res) {
+  let constructedData = new MoistureData(req.body);
+  console.log(constructedData);
 
+  moisture.post(constructedData)
+    .then(response => {
+      console.log(response);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+}
 
 let moistureSensor = data => {
   if (data) {
@@ -71,9 +84,9 @@ let moistureSensor = data => {
         // emit error
         socket.emit('save-status', error);
       });
-  } else if (error) {
+  } else {
     // emit error
-    socket.emit('save-status', error);
+    socket.emit('save-status', data);
   }
 };
 
@@ -82,7 +95,7 @@ socket.on('moisture-sensor', moistureSensor);
 module.exports = {
   server: app,
   start: port => {
-    let PORT = port || 3006;
+    let PORT = port || 3008;
     console.log('Hello World!');
     app.listen(PORT, () => console.log(`Listening on ${PORT}`));
   },
