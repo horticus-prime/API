@@ -21,9 +21,34 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 
+// Routes
+app.get('/moisture', getAllMoisture);
+app.get('/moisture/:id', getMoisture);
+
 // Catchalls
 app.use(notFound);
 app.use(errorHandler);
+
+// Route handlers
+function getAllMoisture(request,response,next) {
+  // expects an array of object to be returned from the model
+  moisture.get()
+    .then( result => {
+      socket.emit('req-data', result);
+      response.status(200).json(result);
+    })
+    .catch( next );
+}
+
+function getMoisture(request,response,next) {
+  // expects an array with the one matching record from the model
+  moisture.get(request.params.id)
+    .then( result => {
+      socket.emit('req-data', result);
+      response.status(200).json(result[0]); 
+    })
+    .catch( next );
+}
 
 // Constructor 
 function MoistureData(data) {
