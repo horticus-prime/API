@@ -2,11 +2,23 @@
 
 const express = require('express');
 const io = require('socket.io-client');
+const cors = require('cors');
+const morgan = require('morgan');
+
+// Esoteric Resources
+const errorHandler = require( './middleware/error.js');
+const notFound = require( './middleware/404.js' );
+
+// Models
+const Moisture = require('./models/moisture.js');
+const moisture = new Moisture();
 
 const socket = io.connect('http://localhost:3005');
 
 const app = express();
 
+app.use(cors());
+app.use(morgan('dev'));
 app.use(express.json());
 
 let moistureSensor = (message) => {
