@@ -13,13 +13,28 @@ const notFound = require( './middleware/404.js' );
 const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
 
+// Prepare the express app
+
 const socket = io.connect('http://localhost:3005');
 
 const app = express();
 
+
+
+// App Level MW
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// swagger
+const options = require('../docs/config/swagger');
+const expressSwagger = require('express-swagger-generator')(app);
+expressSwagger(options);
+
+// jsdoc
+app.use(express.urlencoded({extended:true}));
+app.use(express.static('docs'));
+app.use('/docs', express.static('docs'));
 
 // Routes
 app.get('/moisture', getAllMoisture);
