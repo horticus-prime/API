@@ -62,20 +62,22 @@ function MoistureData(data) {
 
 
 // Route handlers
+
 /**
  * @function getAllMoisture - gets all the moisture data
  * @method get
- * @param req - request
- * @param res - response
- * @param next - middleware
+ * @param request - request
+ * @param response - response
+ * @param {Function} next - Express next middleware function
  * @returns {Object} 200 - valid result
  */
- 
+
 function getAllMoisture(request, response, next) {
   
   /**
   * @desc Gets the moisture data. After which it emits the data via a socket and sends a 200 server response
-  * @desc Or it catches an error and moves on to the next piece of middleware 
+  * @function next - middleware function 
+  * 
   */ 
 
   moisture.get()
@@ -86,9 +88,26 @@ function getAllMoisture(request, response, next) {
     .catch( next );
 }
 
+/**
+ * @function getMoisture - gets one moisture data point
+ * @method get
+ * @param request - request
+ * @param response - response
+ * @param {Function} next - Express next middleware function
+ * @returns {Object} 200 - valid result
+ * @desc expects an array with the one matching record from the model
+ */
 
 function getMoisture(request,response,next) {
-  // expects an array with the one matching record from the model
+  
+  /**
+  * @method get
+  * @param request.params.id - the unique id for a singular data point
+  * @desc retrieves information based on a single data id
+  * @returns {Object} 200 - valid result
+  * @param {Function} next - Express next middleware function
+  */
+
   moisture.get(request.params.id)
     .then( result => {
       socket.emit('req-data', result);
@@ -97,8 +116,17 @@ function getMoisture(request,response,next) {
     .catch( next );
 }
 
-function postData(req, res) {
-  let constructedData = new MoistureData(req.body);
+/**
+ * @function postData - gets one moisture data point
+ * @method post
+ * @param request - request
+ * @param response - response
+ * @returns {Promise} catch - error
+ * @returns {Object} 200 - valid result
+ */
+
+function postData(request, response) {
+  let constructedData = new MoistureData(request.body);
   console.log(constructedData);
 
   moisture.post(constructedData)
@@ -109,6 +137,16 @@ function postData(req, res) {
       console.error(error);
     });
 }
+
+/**
+ * @function moistureSensor - anonymous fucntion which gets one moisture data point
+ * @method post
+ * @param data - data object from soils
+ * @param request - request
+ * @param response - response
+ * @returns {Promise} then - valid result
+ * @returns {Promise} catch - emits error to logger
+ */
 
 let moistureSensor = data => {
   if (data) {
