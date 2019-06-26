@@ -19,8 +19,6 @@ const socket = io.connect('http://localhost:3005');
 
 const app = express();
 
-
-
 // App Level MW
 app.use(cors());
 app.use(morgan('dev'));
@@ -46,11 +44,22 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Constructor 
+/**
+* A class for managing data going into the database
+* @class
+ */
+
 function MoistureData(data) {
+    /**
+  * @type {string} - A string of describing categorization of (wet, moist, dry)
+  * @type {date} - A time stamp for when data was inserted in the database
+  * @type {string} - A number correlated with the category
+  */
   this.moistureCategory = data.moistureCategory;
   this.timestamp = data.timestamp;
   this.moistureNumber = data.moistureNumber;
 }
+
 
 // Route handlers
 function getAllMoisture(request,response,next) {
