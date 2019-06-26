@@ -62,8 +62,22 @@ function MoistureData(data) {
 
 
 // Route handlers
-function getAllMoisture(request,response,next) {
-  // expects an array of object to be returned from the model
+/**
+ * @function getAllMoisture - gets all the moisture data
+ * @method get
+ * @param req - request
+ * @param res - response
+ * @param next - middleware
+ * @returns {Object} 200 - valid result
+ */
+ 
+function getAllMoisture(request, response, next) {
+  
+  /**
+  * @desc Gets the moisture data. After which it emits the data via a socket and sends a 200 server response
+  * @desc Or it catches an error and moves on to the next piece of middleware 
+  */ 
+
   moisture.get()
     .then( result => {
       socket.emit('req-data', result);
@@ -71,6 +85,7 @@ function getAllMoisture(request,response,next) {
     })
     .catch( next );
 }
+
 
 function getMoisture(request,response,next) {
   // expects an array with the one matching record from the model
