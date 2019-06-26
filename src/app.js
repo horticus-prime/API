@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+* @module src/app
+ */
+
+
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -44,30 +49,26 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Constructor 
-/**
-* A class for managing data going into the database
-* @class
- */
 
 function MoistureData(data) {
 
-  /**
+ /**
   * @function MoistureData
-  * @param {Object} - moisture data
-  * A string of describing categorization of (wet, moist, dry)
+  * @param {Object} - moisture data:
+  * @desc A string of describing categorization of (wet, moist, dry)
   * @type {string} 
- */
+  */
   
   this.moistureCategory = data.moistureCategory;
-  
-   /** 
+
+  /** 
    * A time stamp for when data was inserted in the database
    * @type {date}
    */  
 
   this.timestamp = data.timestamp;
 
-   /**
+ /**
   * A number correlated with the category
   * @type {string}
   */
@@ -80,18 +81,16 @@ function MoistureData(data) {
 
 /**
  * @function getAllMoisture - gets all the moisture data
- * @method get
- * @param request - request
- * @param response - response
+ * @param {Object} request - request
+ * @param {Object} response - response
  * @param {Function} next - Express next middleware function
- * @returns {Object} 200 - valid result
  */
 
 function getAllMoisture(request, response, next) {
   
-  /**
-  * @desc Gets the moisture data. After which it emits the data via a socket and sends a 200 server response
-  * @function next - middleware function 
+ /**
+  * @method get - middleware function 
+  * @desc Gets all the moisture data. After which it emits the data via  *     a socket and simultaneously sends a 200 server response
   * 
   */ 
 
@@ -105,22 +104,21 @@ function getAllMoisture(request, response, next) {
 
 /**
  * @function getMoisture - gets one moisture data point
- * @method get
  * @param request - request
  * @param response - response
  * @param {Function} next - Express next middleware function
  * @returns {Object} 200 - valid result
- * @desc expects an array with the one matching record from the model
+ * @desc This function expects an array with the one matching record from the model
  */
 
-function getMoisture(request,response,next) {
+function getMoisture(request, response, next) {
   
-  /**
-  * @method get
+ /**
+  * @method get - testing
+  * @desc This method retrieves information based on a single data id
   * @param request.params.id - the unique id for a singular data point
-  * @desc retrieves information based on a single data id
-  * @returns {Object} 200 - valid result
   * @param {Function} next - Express next middleware function
+  * @returns {Object} 200 - valid result
   */
 
   moisture.get(request.params.id)
@@ -132,8 +130,8 @@ function getMoisture(request,response,next) {
 }
 
 /**
+ * 
  * @function postData - gets one moisture data point
- * @method post
  * @param request - request
  * @param response - response
  * @returns {Promise} catch - error
@@ -154,13 +152,8 @@ function postData(request, response) {
 }
 
 /**
- * @function moistureSensor - anonymous fucntion which gets one moisture data point
- * @method post
- * @param data - data object from soils
- * @param request - request
- * @param response - response
- * @returns {Promise} then - valid result
- * @returns {Promise} catch - emits error to logger
+ * MoistureSensor emits events for data events associated with the database
+ * @param data - data object from soils 
  */
 
 let moistureSensor = data => {
@@ -183,6 +176,10 @@ let moistureSensor = data => {
 };
 
 socket.on('moisture-sensor', moistureSensor);
+
+/**
+ * @module User Exports the module to the Port
+ */
 
 module.exports = {
   server: app,

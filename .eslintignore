@@ -3,5 +3,3 @@
 **/*.min.js
 **/coverage/*
 **/build/*
-**/lang-css.js
-**/prettify.js
