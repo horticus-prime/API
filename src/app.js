@@ -9,6 +9,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const io = require('socket.io-client');
+const oauth = require('./oauth/google.js');
+const auth = require('./utils/auth.js');
 
 // Esoteric Resources
 const errorHandler = require( './middleware/error.js');
@@ -19,8 +21,7 @@ const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
 
 // Prepare the express app
-
-const socket = io.connect('http://localhost:3005');
+const socket = io.connect(process.env.SOCKET);
 
 const app = express();
 
@@ -40,21 +41,27 @@ app.use(express.static('docs'));
 app.use('/docs', express.static('docs'));
 
 // Routes
+
 /**
 * @method get
 * @route GET /{moisture}
  */
-app.get('/moisture', getAllMoisture);
+app.get('/moisture', auth, getAllMoisture);
+
 /**
 * @method get
 * @route GET /moisture/{id}
  */
-app.get('/moisture/:id', getMoisture);
-/**
-* @method post
-* @route POST /{moisture}
- */
-app.post('/moisture', postData);
+app.get('/moisture/:id', auth, getMoisture);
+
+// OAuth
+app.get('/oauth', (req, res, next) => {
+  oauth(req)
+    .then( token => {
+      res.status(200).send(token);
+    })
+    .catch(next);
+});
 
 // Catchalls
 app.use(notFound);
@@ -142,52 +149,26 @@ function getMoisture(request, response, next) {
 }
 
 /**
- * 
- * @function postData - gets one moisture data point
- * @param request - request
- * @param response - response
- * @returns {Promise} catch - error
- * @returns {Object} 200 - valid result
- */
-
-function postData(request, response) {
-  let constructedData = new MoistureData(request.body);
-  console.log(constructedData);
-
-  moisture.post(constructedData)
-    .then(response => {
-      console.log(response);
-    })
-    .catch(error => {
-      console.error(error);
-    });
-}
-
-/**
  * MoistureSensor emits events for data events associated with the database
  * @param data - data object from soils 
  */
 
 let moistureSensor = data => {
-  if (data) {
-    let constructedData = new MoistureData(data);
+  let constructedData = new MoistureData(data);
 
-    moisture.post(constructedData)
-      .then(response => {
-        // emit save
-        socket.emit('save-status', response);
-      })
-      .catch(error => {
-        // emit error
-        socket.emit('save-status', error);
-      });
-  } else {
-    // emit error
-    socket.emit('save-status', data);
-  }
+  moisture.post(constructedData)
+    .then(response => {
+      // emit save
+      socket.emit('save-status', response);
+    })
+    .catch(error => {
+      // emit error
+      socket.emit('save-status', error);
+    });
+  } 
 };
 
-socket.on('moisture-sensor', moistureSensor);
+socket.on('moisture-data', moistureSensor);
 
 /**
  * @module User Exports the module to the Port
@@ -197,7 +178,6 @@ module.exports = {
   server: app,
   start: port => {
     let PORT = port || 3008;
-    console.log('Hello World!');
     app.listen(PORT, () => console.log(`Listening on ${PORT}`));
   },
 };
