@@ -156,6 +156,7 @@ function getMoisture(request, response, next) {
  */
 
 let moistureSensor = data => {
+  console.log('SAVE TO DB');
   let constructedData = new MoistureData(data);
 
   moisture.post(constructedData)
