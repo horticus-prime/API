@@ -114,7 +114,11 @@ function getAllMoisture(request, response, next) {
   moisture.get()
     .then( result => {
       socket.emit('req-data', result);
-      response.status(200).json(result);
+      let obj = {
+        count: result.length,
+        data: result,
+      };
+      response.status(200).json(obj);
     })
     .catch( next );
 }
@@ -156,10 +160,12 @@ let moistureSensor = data => {
 
   moisture.post(constructedData)
     .then(response => {
+      console.log('SAVED');
       // emit save
       socket.emit('save-status', response);
     })
     .catch(error => {
+      console.log('ERROR');
       // emit error
       socket.emit('save-status', error);
     }); 
