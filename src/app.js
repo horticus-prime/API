@@ -69,21 +69,16 @@ function getMoisture(request,response,next) {
 }
 
 let moistureSensor = data => {
-  if (data) {
-    let constructedData = new MoistureData(data);
-    moisture.post(constructedData)
-      .then(response => {
-        // emit save
-        socket.emit('save-status', response);
-      })
-      .catch(error => {
-        // emit error
-        socket.emit('save-status', error);
-      });
-  } else {
-    // emit error
-    socket.emit('save-status', data);
-  }
+  let constructedData = new MoistureData(data);
+  moisture.post(constructedData)
+    .then(response => {
+      // emit save
+      socket.emit('save-status', response);
+    })
+    .catch(error => {
+      // emit error
+      socket.emit('save-status', error);
+    });
 };
 
 socket.on('moisture-data', moistureSensor);
