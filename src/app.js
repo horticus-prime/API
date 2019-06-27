@@ -76,7 +76,7 @@ function MoistureData(data) {
   * @type {string} 
   */
   
-  this.moistureCategory = data.category;
+  this.moistureCategory = data.moistureCategory;
 
   /** 
    * A time stamp for when data was inserted in the database
@@ -90,7 +90,7 @@ function MoistureData(data) {
   * @type {string}
   */
 
-  this.moistureNumber = data.val;
+  this.moistureNumber = data.moistureNumber;
 }
 
 
