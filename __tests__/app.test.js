@@ -27,4 +27,9 @@ describe('api server', () => {
         expect(results.status).toBe(404);
       });
   });
+
+  // it('should emit on "save-status, data" event', () => {
+  //   socket.emit('save-status', data);
+    
+  // })
 });
