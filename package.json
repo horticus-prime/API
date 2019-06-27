@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/horticus-prime/API-server#readme",
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "eslint": "^6.0.0",
@@ -27,6 +28,7 @@
     "express-swagger-generator": "^1.1.15",
     "jest": "^24.8.0",
     "jsdoc": "^3.6.2",
+    "jsonwebtoken": "^8.5.1",
     "mongodb-memory-server": "^5.1.5",
     "mongoose": "^5.6.1",
     "morgan": "^1.9.1",
