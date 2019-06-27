@@ -4,6 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const io = require('socket.io-client');
+const oauth = require('./oauth/google.js');
+const auth = require('./utils/auth.js');
 
 // Esoteric Resources
 const errorHandler = require( './middleware/error.js');
@@ -13,7 +15,7 @@ const notFound = require( './middleware/404.js' );
 const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
 
-const socket = io.connect('http://localhost:3005');
+const socket = io.connect(process.env.SOCKET);
 
 const app = express();
 
@@ -22,9 +24,17 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.get('/moisture', getAllMoisture);
-app.get('/moisture/:id', getMoisture);
-app.post('/moisture', postData);
+app.get('/moisture', auth, getAllMoisture);
+app.get('/moisture/:id', auth, getMoisture);
+
+// OAuth
+app.get('/oauth', (req, res, next) => {
+  oauth(req)
+    .then( token => {
+      res.status(200).send(token);
+    })
+    .catch(next);
+});
 
 // Catchalls
 app.use(notFound);
@@ -58,45 +68,25 @@ function getMoisture(request,response,next) {
     .catch( next );
 }
 
-function postData(req, res) {
-  let constructedData = new MoistureData(req.body);
-  console.log(constructedData);
-
+let moistureSensor = data => {
+  let constructedData = new MoistureData(data);
   moisture.post(constructedData)
     .then(response => {
-      console.log(response);
+      // emit save
+      socket.emit('save-status', response);
     })
     .catch(error => {
-      console.error(error);
+      // emit error
+      socket.emit('save-status', error);
     });
-}
-
-let moistureSensor = data => {
-  if (data) {
-    let constructedData = new MoistureData(data);
-
-    moisture.post(constructedData)
-      .then(response => {
-        // emit save
-        socket.emit('save-status', response);
-      })
-      .catch(error => {
-        // emit error
-        socket.emit('save-status', error);
-      });
-  } else {
-    // emit error
-    socket.emit('save-status', data);
-  }
 };
 
-socket.on('moisture-sensor', moistureSensor);
+socket.on('moisture-data', moistureSensor);
 
 module.exports = {
   server: app,
   start: port => {
     let PORT = port || 3008;
-    console.log('Hello World!');
     app.listen(PORT, () => console.log(`Listening on ${PORT}`));
   },
 };
