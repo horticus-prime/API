@@ -167,6 +167,7 @@ let moistureSensor = data => {
     })
     .catch(error => {
       console.log('ERROR');
+      console.log(error);
       // emit error
       socket.emit('save-status', error);
     }); 
