@@ -40,8 +40,20 @@ app.use(express.static('docs'));
 app.use('/docs', express.static('docs'));
 
 // Routes
+/**
+* @method get
+* @route GET /{moisture}
+ */
 app.get('/moisture', getAllMoisture);
+/**
+* @method get
+* @route GET /moisture/{id}
+ */
 app.get('/moisture/:id', getMoisture);
+/**
+* @method post
+* @route POST /{moisture}
+ */
 app.post('/moisture', postData);
 
 // Catchalls

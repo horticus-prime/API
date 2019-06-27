@@ -7,7 +7,7 @@ module.exports = {
       title: 'Swagger doc page',
       version: '0.0.1',
     },
-    basePath: '/api/v1',
+    basePath: '/',
     produces: [
       'application/json',
     ],
@@ -20,5 +20,5 @@ module.exports = {
     },
   },
   basedir: __dirname,
-  files: ['../../src/auth/*.js', '../../src/middleware/*.js', '../../src/auth/routes/*.js', '../../src/*.js'],
+  files: ['../../src/app.js'],
 };
