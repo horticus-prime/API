@@ -9,6 +9,10 @@
     "test-watch": "jest --watchAll",
     "test": "jest --verbose --coverage"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/horticus-prime/API-server.git"
@@ -33,7 +37,9 @@
     "mongoose": "^5.6.1",
     "morgan": "^1.9.1",
     "socket.io-client": "^2.2.0",
-    "superagent": "^5.1.0"
+    "superagent": "^5.1.0",
+    "supergoose": "^0.2.6",
+    "supertest": "^4.0.2"
   },
   "devDependencies": {}
 }

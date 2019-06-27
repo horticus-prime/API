@@ -79,7 +79,7 @@ let moistureSensor = data => {
       // emit error
       socket.emit('save-status', error);
     });
-};
+}
 
 socket.on('moisture-data', moistureSensor);
 
