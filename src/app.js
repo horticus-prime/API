@@ -4,7 +4,6 @@
 * @module src/app
  */
 
-
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -87,7 +86,7 @@ function MoistureData(data) {
 
   this.timestamp = data.timestamp;
 
- /**
+  /**
   * A number correlated with the category
   * @type {string}
   */
@@ -107,7 +106,7 @@ function MoistureData(data) {
 
 function getAllMoisture(request, response, next) {
   
- /**
+  /**
   * @method get - middleware function 
   * @desc Gets all the moisture data. After which it emits the data via  *     a socket and simultaneously sends a 200 server response
   * 
@@ -132,7 +131,7 @@ function getAllMoisture(request, response, next) {
 
 function getMoisture(request, response, next) {
   
- /**
+  /**
   * @method get - testing
   * @desc This method retrieves information based on a single data id
   * @param request.params.id - the unique id for a singular data point
@@ -164,8 +163,7 @@ let moistureSensor = data => {
     .catch(error => {
       // emit error
       socket.emit('save-status', error);
-    });
-  } 
+    }); 
 };
 
 socket.on('moisture-data', moistureSensor);
