@@ -5,7 +5,14 @@ const User = require('../../lib/models/users-schema.js');
 module.exports = (req, res, next) => {
   
   try {
-    let [authType, authString] = req.headers.authorization.split(/\s+/);
+    let authType, authString;
+    
+    if (req.headers.authorization) {
+      [authType, authString] = req.headers.authorization.split(/\s+/);
+    } else {
+      throw new Error('Not Authorized');
+    }
+    
     switch( authType.toLowerCase() ) {
     case 'bearer':
       return _authBearer(authString);

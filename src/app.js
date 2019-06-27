@@ -24,9 +24,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.get('/moisture', auth(), getAllMoisture);
-app.get('/moisture/:id', auth(), getMoisture);
-app.post('/moisture', auth(), postData);
+app.get('/moisture', auth, getAllMoisture);
+app.get('/moisture/:id', auth, getMoisture);
+app.post('/moisture', auth, postData);
 
 // OAuth
 app.get('/oauth', (req, res, next) => {
@@ -71,7 +71,7 @@ function getMoisture(request,response,next) {
     .catch( next );
 }
 
-function postData(req, res) {
+function postData(req) {
   let constructedData = new MoistureData(req.body);
   console.log(constructedData);
 
