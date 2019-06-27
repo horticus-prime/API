@@ -68,7 +68,6 @@ app.use(errorHandler);
 // Constructor 
 
 function MoistureData(data) {
-  console.log('CONSTRUCTOR: ', data);
  /**
   * @function MoistureData
   * @param {Object} - moisture data:
