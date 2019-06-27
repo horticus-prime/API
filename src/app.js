@@ -68,7 +68,7 @@ app.use(errorHandler);
 // Constructor 
 
 function MoistureData(data) {
- /**
+  /**
   * @function MoistureData
   * @param {Object} - moisture data:
   * @desc A string of describing categorization of (wet, moist, dry)
