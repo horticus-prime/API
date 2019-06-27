@@ -5,6 +5,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const io = require('socket.io-client');
 const oauth = require('./oauth/google.js');
+const auth = require('./utils/auth.js');
 
 // Esoteric Resources
 const errorHandler = require( './middleware/error.js');
@@ -23,9 +24,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.get('/moisture', getAllMoisture);
-app.get('/moisture/:id', getMoisture);
-app.post('/moisture', postData);
+app.get('/moisture', auth(), getAllMoisture);
+app.get('/moisture/:id', auth(), getMoisture);
+app.post('/moisture', auth(), postData);
 
 // OAuth
 app.get('/oauth', (req, res, next) => {
