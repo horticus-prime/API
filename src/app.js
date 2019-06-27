@@ -161,6 +161,7 @@ let moistureSensor = data => {
   moisture.post(constructedData)
     .then(response => {
       console.log('SAVED');
+      console.log(response);
       // emit save
       socket.emit('save-status', response);
     })
