@@ -15,7 +15,7 @@ const notFound = require( './middleware/404.js' );
 const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
 
-const socket = io.connect('http://localhost:3005');
+const socket = io.connect(process.env.SOCKET);
 
 const app = express();
 
@@ -26,14 +26,11 @@ app.use(express.json());
 // Routes
 app.get('/moisture', auth, getAllMoisture);
 app.get('/moisture/:id', auth, getMoisture);
-app.post('/moisture', auth, postData);
 
 // OAuth
 app.get('/oauth', (req, res, next) => {
-  console.log('OAUTH');
   oauth(req)
     .then( token => {
-      console.log(token);
       res.status(200).send(token);
     })
     .catch(next);
@@ -71,23 +68,9 @@ function getMoisture(request,response,next) {
     .catch( next );
 }
 
-function postData(req) {
-  let constructedData = new MoistureData(req.body);
-  console.log(constructedData);
-
-  moisture.post(constructedData)
-    .then(response => {
-      console.log(response);
-    })
-    .catch(error => {
-      console.error(error);
-    });
-}
-
 let moistureSensor = data => {
   if (data) {
     let constructedData = new MoistureData(data);
-
     moisture.post(constructedData)
       .then(response => {
         // emit save
@@ -103,13 +86,12 @@ let moistureSensor = data => {
   }
 };
 
-socket.on('moisture-sensor', moistureSensor);
+socket.on('moisture-data', moistureSensor);
 
 module.exports = {
   server: app,
   start: port => {
     let PORT = port || 3008;
-    console.log('Hello World!');
     app.listen(PORT, () => console.log(`Listening on ${PORT}`));
   },
 };
