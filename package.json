@@ -9,6 +9,10 @@
     "test-watch": "jest --watchAll",
     "test": "jest --verbose --coverage"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/horticus-prime/API-server.git"
