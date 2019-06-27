@@ -68,7 +68,7 @@ app.use(errorHandler);
 // Constructor 
 
 function MoistureData(data) {
-
+  console.log('CONSTRUCTOR: ', data);
  /**
   * @function MoistureData
   * @param {Object} - moisture data:
@@ -76,7 +76,7 @@ function MoistureData(data) {
   * @type {string} 
   */
   
-  this.moistureCategory = data.moistureCategory;
+  this.moistureCategory = data.category;
 
   /** 
    * A time stamp for when data was inserted in the database
@@ -90,7 +90,7 @@ function MoistureData(data) {
   * @type {string}
   */
 
-  this.moistureNumber = data.moistureNumber;
+  this.moistureNumber = data.val;
 }
 
 
@@ -156,9 +156,8 @@ function getMoisture(request, response, next) {
  */
 
 let moistureSensor = data => {
-  console.log('SAVE TO DB');
   let constructedData = new MoistureData(data);
-  console.log(constructedData);
+
   moisture.post(constructedData)
     .then(response => {
       console.log('SAVED');
