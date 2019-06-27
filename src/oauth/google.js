@@ -3,7 +3,6 @@
 const superagent = require('superagent');
 const Users = require('../../lib/models/users-schema.js');
 
-const API = 'http://localhost:3010';
 const GTS = 'https://www.googleapis.com/oauth2/v4/token';
 const SERVICE = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
 
@@ -14,7 +13,7 @@ let authorize = (request) => {
       code: request.query.code,
       client_id: process.env.CLIENT_ID,
       client_secret: process.env.CLIENT_SECRET,
-      redirect_uri: `${API}/oauth`,
+      redirect_uri: `${process.env.API}/oauth`,
       grant_type: 'authorization_code',
     })
     .then( response => {
