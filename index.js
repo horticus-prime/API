@@ -10,8 +10,8 @@ const mongooseOptions = {
 };
 
 mongoose.connect(process.env.MONGODB_URI, mongooseOptions);
-console.log(process.env.MONGODB_URI);
-console.log(process.env.PORT);
+// console.log(process.env.MONGODB_URI);
+// console.log(process.env.PORT);
 
 const app = require('./src/app.js');
 
