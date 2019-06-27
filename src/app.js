@@ -31,7 +31,7 @@ app.get('/moisture/:id', auth, getMoisture);
 app.get('/oauth', (req, res, next) => {
   oauth(req)
     .then( token => {
-      console.log(token);
+      console.log('TOKEN: ', token);
       res.status(200).send(token);
     })
     .catch(next);
