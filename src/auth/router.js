@@ -30,8 +30,7 @@ const capabilities = {
  */
 
 // To create roles visit this route once
-authRouter.post('/role', (req, res) => {
-  console.log('roles');
+authRouter.post('/roles', (req, res) => { 
   let saves = [];
   Object.keys(capabilities).map(role => {
     let newRecord = new Role({role, capabilities: capabilities[role]});
@@ -51,7 +50,6 @@ authRouter.post('/role', (req, res) => {
  * @returns {Object} 500 - Server error
  * @returns {String} 200 - A token containing all user information
  */
-
 authRouter.post('/signup', (req, res, next) => {
   let user = new User(req.body);
   user.save()
