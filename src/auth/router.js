@@ -15,8 +15,8 @@ const auth = require('./middleware.js');
 // Capablities object containing information for each role
 const capabilities = {
   admin: ['create', 'read', 'update', 'delete', 'superuser'],
-  editor: ['create', 'read', 'update'],
-  user: ['read'],
+  senior: ['create', 'read', 'update'],
+  assistant: ['read'],
 };
 /* istanbul ignore next */
 /**
