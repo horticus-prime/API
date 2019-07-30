@@ -3,17 +3,16 @@
 /**
 * @module src/app
  */
-
+const cwd = process.cwd();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const io = require('socket.io-client');
-const oauth = require('./oauth/google.js');
-const auth = require('./utils/auth.js');
 
 // Esoteric Resources
-const errorHandler = require( './middleware/error.js');
-const notFound = require( './middleware/404.js' );
+const errorHandler = require( `${cwd}/src/middleware/error.js`);
+const notFound = require( `${cwd}/src/middleware/404.js` );
+const authRouter = require(`${cwd}/src/auth/router.js`);
 
 // Models
 const Moisture = require('../lib/models/moisture.js');
@@ -38,28 +37,22 @@ expressSwagger(options);
 app.use(express.urlencoded({extended:true}));
 app.use('/docs', express.static('docs'));
 
+//Routes
+app.use(authRouter);
+
 // Routes
 
 /**
 * @method get
 * @route GET /{moisture}
  */
-app.get('/moisture', auth, getAllMoisture);
+app.get('/moisture', getAllMoisture);
 
 /**
 * @method get
 * @route GET /moisture/{id}
  */
-app.get('/moisture/:id', auth, getMoisture);
-
-// OAuth
-app.get('/oauth', (req, res, next) => {
-  oauth(req)
-    .then( token => {
-      res.status(200).send(token);
-    })
-    .catch(next);
-});
+app.get('/moisture/:id', getMoisture);
 
 // Catchalls
 app.use(notFound);
