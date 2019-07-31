@@ -164,7 +164,7 @@ let arr = [];
 
 let aggregator = data => {
   console.log('number', data);
-  arr.push(Number(data.moistureNumber));
+  arr.push(Number(data.val));
 };
 
 cron.schedule('* */5 * * * *', function() {
