@@ -9,6 +9,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const io = require('socket.io-client');
 const moment = require('moment');
+const cron = require('node-cron');
 
 // Esoteric Resources
 const errorHandler = require( `${cwd}/src/middleware/error.js`);
@@ -18,6 +19,8 @@ const authRouter = require(`${cwd}/src/auth/router.js`);
 // Models
 const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
+const Users = require('../lib/models/users.js');
+const users = new Users();
 
 let MongoClient = require('mongodb').MongoClient;
 
@@ -49,13 +52,17 @@ app.use(authRouter);
 * @method get
 * @route GET /{moisture}
  */
-app.get('/moisture', getAllMoisture);
+// app.get('/moisture', getAllMoisture);
 
 /**
 * @method get
 * @route GET /moisture/{id}
  */
-app.get('/moisture/:id', getMoisture);
+app.get('/moisture', getMoisture);
+app.get('/user', getUser);
+app.post('/user', addUser);
+app.put('/user/:id', editUser);
+app.delete('/user/:id', deleteUser);
 
 // Catchalls
 app.use(notFound);
@@ -69,6 +76,37 @@ app.use(errorHandler);
  * @param {Object} response - response
  * @param {Function} next - Express next middleware function
  */
+
+function getUser(req, res, next) {
+  console.log('hello');
+  users.get()
+    .then(result => {
+      res.send(result);
+    });
+}
+
+function addUser(req, res, next) {
+  let payload = req.body;
+
+  users.post(payload)
+    .then(result => {
+      res.send(result);
+    });
+}
+
+function editUser(req, res, next) {
+  users.put(req.params.id, req.body)
+    .then(result => {
+      res.send(result);
+    });
+}
+
+function deleteUser(req, res, next) {
+  users.delete(req.params.id)
+    .then(result => {
+      res.send(result);
+    });
+}
 
 function getAllMoisture(request, response, next) {
   
@@ -100,53 +138,73 @@ function getAllMoisture(request, response, next) {
  */
 
 function getMoisture(request, response, next) {
-  
-  /**
-  * @method get - testing
-  * @desc This method retrieves information based on a single data id
-  * @param request.params.id - the unique id for a singular data point
-  * @param {Function} next - Express next middleware function
-  * @returns {Object} 200 - valid result
-  */
+  let query = { year: request.body.year, month: request.body.month, day: request.body.day };
 
-  moisture.get(request.params.id)
-    .then( result => {
-      socket.emit('req-data', result);
-      response.status(200).json(result[0]); 
-    })
-    .catch( next );
+  // moisture.get(query)
+  //   .then( result => {
+  //     response.status(200).send(result); 
+  //   })
+  //   .catch( next );
+
+  MongoClient.connect('mongodb://localhost:27017/', function(err, db) {
+    var dbo = db.db('moisture');
+    dbo.collection('moistures').find(query).toArray(function(err, result) {
+      console.log(result);
+      response.status(200).send(result);
+    });
+  });
 }
 
 /**
  * MoistureSensor emits events for data events associated with the database
  * @param data - data object from soils 
  */
+
+let arr = [];
+
+let aggregator = data => {
+  arr.push(Number(data.moistureNumber));
+};
+
+cron.schedule('* */5 * * * *', function() {
+  if (arr.length > 0) {
+    let newArr = arr;
+    let length = newArr.length;
+    arr = [];
+
+    let total = newArr.reduce((acc, cur) => {
+      acc += cur;
+
+      return acc;
+    }, 0);
+
+    total = total / length;
+
+    let obj = {moistureNumber: total, timestamp: new Date()};
+    
+    moistureSensor(obj);
+  }
+});
+
 let moistureSensor = data => {
   // Query
   MongoClient.connect('mongodb://localhost:27017/', function(err, db) {
-    console.log(data.month);
-    console.log(data.year);
-    console.log(data.day);
-    moisture.post(data)
-      .then(res => {
-        console.log(res);
-      });
-    // var dbo = db.db('moisture');
-    // const query = { year: '2022', month: moment().format('MM'), day: moment().format('DD') };
-    // dbo.collection('moistures').find(query).toArray(function(err, result) {
-      // if (result.length === 0) {
-      //   moisture.post(query)
-      //     .then(() => {
-      //       dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
-      //     });
-      // } else {
-      // dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
-      // }
-    // });
+    var dbo = db.db('moisture');
+    const query = { year: moment().format('YYYY'), month: "08", day: "01" };
+    dbo.collection('moistures').find(query).toArray(function(err, result) {
+      if (result.length === 0) {
+        moisture.post(query)
+          .then(() => {
+            dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+          });
+      } else {
+        dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+      }
+    });
   });
 };
 
-socket.on('moisture-data', moistureSensor);
+socket.on('moisture-data', aggregator);
 
 /**
  * @module User Exports the module to the Port
