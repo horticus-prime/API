@@ -189,8 +189,9 @@ cron.schedule('* */5 * * * *', function() {
 let moistureSensor = data => {
   // Query
   MongoClient.connect('mongodb://localhost:27017/', function(err, db) {
+    console.log('data', data);
     var dbo = db.db('moisture');
-    const query = { year: moment().format('YYYY'), month: "08", day: "01" };
+    const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
     dbo.collection('moistures').find(query).toArray(function(err, result) {
       if (result.length === 0) {
         moisture.post(query)
