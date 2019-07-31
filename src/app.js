@@ -163,6 +163,7 @@ function getMoisture(request, response, next) {
 let arr = [];
 
 let aggregator = data => {
+  console.log('number', data);
   arr.push(Number(data.moistureNumber));
 };
 
