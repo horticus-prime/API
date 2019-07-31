@@ -190,7 +190,7 @@ let moistureSensor = data => {
   // Query
   MongoClient.connect('mongodb://localhost:27017/', function(err, db) {
     var dbo = db.db('moisture');
-    const query = { year: moment().format('YYYY'), month: moment().format('YYYY'), day: moment().format('YYYY') };
+    const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
     dbo.collection('moistures').find(query).toArray(function(err, result) {
       if (result.length === 0) {
         moisture.post(query)
