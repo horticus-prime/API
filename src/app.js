@@ -8,6 +8,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const io = require('socket.io-client');
+const moment = require('moment');
 
 // Esoteric Resources
 const errorHandler = require( `${cwd}/src/middleware/error.js`);
@@ -18,7 +19,7 @@ const authRouter = require(`${cwd}/src/auth/router.js`);
 const Moisture = require('../lib/models/moisture.js');
 const moisture = new Moisture();
 
-var MongoClient = require('mongodb').MongoClient;
+let MongoClient = require('mongodb').MongoClient;
 
 // Prepare the express app
 const socket = io.connect(process.env.SOCKET);
@@ -161,21 +162,22 @@ function getMoisture(request, response, next) {
 let moistureSensor = data => {
   // Query
   MongoClient.connect('mongodb://localhost:27017/', function(err, db) {
-    console.log('hello');
-    console.log('db', db);
     var dbo = db.db("moisture");
-    const query = { year: 2019, month: 8, day: 30 };
+    const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
+    console.log('query', query);
     dbo.collection("moistures").find(query).toArray(function(err, result) {
+      console.log('result', result);
       if (result.length === 0) {
-        console.log('doesnt');
-        moisture.post(data)
+        moisture.post(query)
           .then(response => {
-            console.log('SAVED');
-            console.log(response);
+            console.log('response', response);
+            console.log('data', data);
+            dbo.collection("moistures").findOneAndUpdate(query, { $push: { reads: data  } }, (err, success) => {
+              console.log('success', success);
+              console.log('err', err);
+            });
           });
       } else {
-        console.log('exists');
-        console.log(result[1]);
         dbo.collection("moistures").findOneAndUpdate(query, { $push: { reads: data  } }, (err, success) => {
           console.log('success', success);
         });
