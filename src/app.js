@@ -61,43 +61,6 @@ app.get('/moisture/:id', getMoisture);
 app.use(notFound);
 app.use(errorHandler);
 
-// Constructor 
-
-// function MoistureData(data) {
-//   /**
-//   * @function MoistureData
-//   * @param {Object} - moisture data:
-//   * @desc A string of describing categorization of (wet, moist, dry)
-//   * @type {string} 
-//   */
-
-//   console.log('asdasdasdasdsaasdasdasdasdasdadasdas data', typeof data);
-//   // console.log(typeof data.month);
-//   // console.log(typeof data.day);
-
-//   this.year = data.year;
-//   this.month = data.month;
-//   this.day = data.day;
-//   this.read = data.read;
-  
-//   // this.moistureCategory = data.moistureCategory;
-
-//   /** 
-//    * A time stamp for when data was inserted in the database
-//    * @type {date}
-//    */  
-
-//   // this.timestamp = data.timestamp;
-
-//   /**
-//   * A number correlated with the category
-//   * @type {string}
-//   */
-
-//   // this.moistureNumber = data.moistureNumber;
-// }
-
-
 // Route handlers
 
 /**
@@ -158,51 +121,29 @@ function getMoisture(request, response, next) {
  * MoistureSensor emits events for data events associated with the database
  * @param data - data object from soils 
  */
-
 let moistureSensor = data => {
   // Query
   MongoClient.connect('mongodb://localhost:27017/', function(err, db) {
-    var dbo = db.db("moisture");
-    const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
-    console.log('query', query);
-    dbo.collection("moistures").find(query).toArray(function(err, result) {
-      console.log('result', result);
-      if (result.length === 0) {
-        moisture.post(query)
-          .then(response => {
-            console.log('response', response);
-            console.log('data', data);
-            dbo.collection("moistures").findOneAndUpdate(query, { $push: { reads: data  } }, (err, success) => {
-              console.log('success', success);
-              console.log('err', err);
-            });
-          });
-      } else {
-        dbo.collection("moistures").findOneAndUpdate(query, { $push: { reads: data  } }, (err, success) => {
-          console.log('success', success);
-        });
-      }
-    });
+    console.log(data.month);
+    console.log(data.year);
+    console.log(data.day);
+    moisture.post(data)
+      .then(res => {
+        console.log(res);
+      });
+    // var dbo = db.db('moisture');
+    // const query = { year: '2022', month: moment().format('MM'), day: moment().format('DD') };
+    // dbo.collection('moistures').find(query).toArray(function(err, result) {
+      // if (result.length === 0) {
+      //   moisture.post(query)
+      //     .then(() => {
+      //       dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+      //     });
+      // } else {
+      // dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+      // }
+    // });
   });
-
-  // If exists
-
-  // esle
-
-  // console.log(typeof constructedData.year);
-  // moisture.post(constructedData)
-  //   .then(response => {
-  //     console.log('SAVED');
-  //     console.log(response);
-  //     // emit save
-  //     socket.emit('save-status', response);
-  //   })
-  //   .catch(error => {
-  //     console.log('ERROR');
-  //     console.log(error);
-  //     // emit error
-  //     socket.emit('save-status', error);
-  //   }); 
 };
 
 socket.on('moisture-data', moistureSensor);
