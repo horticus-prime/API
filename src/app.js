@@ -194,7 +194,8 @@ let moistureSensor = data => {
     var dbo = db.db('moisture');
     const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
     dbo.collection('moistures').find(query).toArray(function(err, result) {
-      if (result.length === 0) {
+      console.log(result);
+      if (result && result.length === 0) {
         moisture.post(query)
           .then(() => {
             dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
