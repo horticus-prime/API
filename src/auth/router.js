@@ -52,15 +52,20 @@ authRouter.post('/roles', (req, res) => {
  */
 authRouter.post('/signup', (req, res, next) => {
   let user = new User(req.body);
+  console.log(user);
   user.save()
     .then( (user) => {
+      console.log(user);
       req.token = user.generateToken();
       req.user = user;
       res.set('token', req.token);
       res.cookie('auth', req.token);
       res.status(200).send(req.token);
     })
-    .catch(next);
+    .catch(err => {
+      console.log(err);
+      next(err);
+    });
 });
 
 /**
