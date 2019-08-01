@@ -52,10 +52,9 @@ authRouter.post('/roles', (req, res) => {
  */
 authRouter.post('/signup', (req, res, next) => {
   let user = new User(req.body);
-  console.log(user);
   user.save()
     .then( (user) => {
-      console.log(user);
+      console.log('USER', user);
       req.token = user.generateToken();
       req.user = user;
       res.set('token', req.token);

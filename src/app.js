@@ -58,8 +58,8 @@ app.use(authRouter);
 * @method get
 * @route GET /moisture/{id}
  */
-app.get('/moisture', getAllMoisture);
-app.get('/moisture/:year&month&day', getMoistureByDate);
+// app.get('/moisture', getAllMoisture);
+app.get('/moisture', getMoistureByDate);
 app.get('/user', getUser);
 app.post('/user', addUser);
 app.put('/user/:id', editUser);
@@ -146,7 +146,10 @@ function getMoistureByDate(request, response, next) {
   //   })
   //   .catch( next );
 
-  moisture.getByDate(request.body.year, request.body.month, request.body.day)
+  console.log(request.query);
+
+
+  moisture.getByDate(request.query.year, request.query.month, request.query.day)
     .then(result => {
       response.status(200).send(result);
     })
