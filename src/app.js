@@ -188,24 +188,47 @@ cron.schedule('*/10 * * * * *', function() {
 });
 
 let moistureSensor = data => {
-  // Query
-  MongoClient.connect(process.env.MONGODB_URI, { useNewUrlParser: true }, function(err, db) {
-    console.log('data', data);
-    console.log('mongodb_uri', process.env.MONGODB_URI);
-    var dbo = db.db('moisture');
-    const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
-    dbo.collection('moistures').find(query).toArray(function(err, result) {
-      console.log(result);
-      if (result && result.length === 0) {
-        moisture.post(query)
-          .then(() => {
-            dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
-          });
+  // get by year month day
+  moisture.getByDate(moment().format('YYYY'), moment().format('MM'), moment().format('DD'))
+    .then(result => {
+      if (result && result.length > 0) {
+        // If yes, 
+        //then push into reads array and call put with id and payload
+        result[0].reads.push(data);
+        moisture.put({year: result[0].year, month: result[0].month, day: result[0].day}, result[0]);
       } else {
-        dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+        // else 
+        // call new Moisture();
+        let payload = {
+          year: moment().format('YYYY'),
+          month: moment().format('MM'),
+          day: moment().format('DD'),
+          reads: [data],
+        };
+        // call post
+        moisture.post(payload);
       }
     });
-  });
+
+
+  // Query
+  // MongoClient.connect(process.env.MONGODB_URI, { useNewUrlParser: true }, function(err, db) {
+  //   console.log('data', data);
+  //   console.log('mongodb_uri', process.env.MONGODB_URI);
+  //   var dbo = db.db('moisture');
+  //   const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
+  //   dbo.collection('moistures').find(query).toArray(function(err, result) {
+  //     console.log(result);
+  //     if (result && result.length === 0) {
+  //       moisture.post(query)
+  //         .then(() => {
+  //           dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+  //         });
+  //     } else {
+  //       dbo.collection('moistures').findOneAndUpdate(query, { $push: { reads: data  } });
+  //     }
+  //   });
+  // });
 };
 
 socket.on('moisture-data', aggregator);
