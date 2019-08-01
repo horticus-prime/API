@@ -191,6 +191,7 @@ let moistureSensor = data => {
   // Query
   MongoClient.connect(process.env.MONGODB_URI, function(err, db) {
     console.log('data', data);
+    console.log('mongodb_uri', process.env.MONGODB_URI);
     var dbo = db.db('moisture');
     const query = { year: moment().format('YYYY'), month: moment().format('MM'), day: moment().format('DD') };
     dbo.collection('moistures').find(query).toArray(function(err, result) {
