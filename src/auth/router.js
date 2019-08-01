@@ -74,6 +74,7 @@ authRouter.post('/signup', (req, res, next) => {
  * @returns {String} 200 - A token containing all user information
  */
 authRouter.get('/signin', auth(), (req, res) => {
+  console.log('hello');
   res.cookie('auth', req.token);
   res.send(req.token);
 });

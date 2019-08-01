@@ -58,7 +58,8 @@ app.use(authRouter);
 * @method get
 * @route GET /moisture/{id}
  */
-app.get('/moisture', getMoisture);
+app.get('/moisture', getAllMoisture);
+app.get('/moisture/:year&month&day', getMoistureByDate);
 app.get('/user', getUser);
 app.post('/user', addUser);
 app.put('/user/:id', editUser);
@@ -137,8 +138,7 @@ function getAllMoisture(request, response, next) {
  * @desc This function expects an array with the one matching record from the model
  */
 
-function getMoisture(request, response, next) {
-  let query = { year: request.body.year, month: request.body.month, day: request.body.day };
+function getMoistureByDate(request, response, next) {
 
   // moisture.get(query)
   //   .then( result => {
@@ -146,13 +146,13 @@ function getMoisture(request, response, next) {
   //   })
   //   .catch( next );
 
-  MongoClient.connect(process.env.MONGODB_URI, function(err, db) {
-    var dbo = db.db('moisture');
-    dbo.collection('moistures').find(query).toArray(function(err, result) {
-      console.log(result);
+  moisture.getByDate(request.body.year, request.body.month, request.body.day)
+    .then(result => {
       response.status(200).send(result);
+    })
+    .catch(err => {
+      response.send(err);
     });
-  });
 }
 
 /**
