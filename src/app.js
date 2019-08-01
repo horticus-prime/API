@@ -189,7 +189,7 @@ cron.schedule('*/10 * * * * *', function() {
 
 let moistureSensor = data => {
   // Query
-  MongoClient.connect(process.env.MONGODB_URI, function(err, db) {
+  MongoClient.connect(process.env.MONGODB_URI, { useNewUrlParser: true }, function(err, db) {
     console.log('data', data);
     console.log('mongodb_uri', process.env.MONGODB_URI);
     var dbo = db.db('moisture');
