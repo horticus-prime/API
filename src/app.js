@@ -167,7 +167,7 @@ let aggregator = data => {
   arr.push(Number(data.val));
 };
 
-cron.schedule('* */5 * * * *', function() {
+cron.schedule('*/10 * * * * *', function() {
   if (arr.length > 0) {
     let newArr = arr;
     let length = newArr.length;
