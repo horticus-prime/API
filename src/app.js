@@ -58,7 +58,7 @@ app.use(authRouter);
 * @method get
 * @route GET /moisture/{id}
  */
-// app.get('/moisture', getAllMoisture);
+app.get('/moistures', getAllMoisture);
 app.get('/moisture', getMoistureByDate);
 app.get('/user', getUser);
 app.post('/user', addUser);
@@ -117,14 +117,9 @@ function getAllMoisture(request, response, next) {
   * 
   */ 
 
-  moisture.get()
+  moisture.getAll()
     .then( result => {
-      socket.emit('req-data', result);
-      let obj = {
-        count: result.length,
-        data: result,
-      };
-      response.status(200).json(obj);
+      response.status(200).send(result);
     })
     .catch( next );
 }
